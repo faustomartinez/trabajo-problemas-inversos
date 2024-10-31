@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.10) (preloaded format=pdflatex 2020.10.28)  31 OCT 2024 18:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 20.10) (preloaded format=pdflatex 2020.10.28)  31 OCT 2024 19:02
 entering extended mode
 **./trabajo-final.tex
 (trabajo-final.tex
@@ -121,22 +121,23 @@ LaTeX Font Info:    ... okay on input line 9.
 Chapter 1.
 [2
 
-] (trabajo-final.aux) ) 
+] [3] (trabajo-final.aux) ) 
 Here is how much of TeX's memory you used:
- 1101 strings out of 480257
- 15457 string characters out of 2891249
- 282963 words of memory out of 3000000
- 17686 multiletter control sequences out of 15000+200000
- 541680 words of font info for 52 fonts, out of 3000000 for 9000
+ 1105 strings out of 480257
+ 15503 string characters out of 2891249
+ 283963 words of memory out of 3000000
+ 17689 multiletter control sequences out of 15000+200000
+ 542339 words of font info for 54 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  59i,6n,66p,856b,181s stack positions out of 5000i,500n,10000p,200000b,50000s
-<C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/
-cmbx12.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
-C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Fi
-les/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb>
-Output written on trabajo-final.pdf (3 pages, 49373 bytes).
+<C:/Program Files/MiKTeX/fonts/type1/public/amsfonts
+/cm/cmbx12.pfb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi12.p
+fb><C:/Program Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Progra
+m Files/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Program Files/MiKTe
+X/fonts/type1/public/amsfonts/cm/cmsl12.pfb>
+Output written on trabajo-final.pdf (4 pages, 63897 bytes).
 PDF statistics:
- 28 PDF objects out of 1000 (max. 8388607)
+ 35 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
