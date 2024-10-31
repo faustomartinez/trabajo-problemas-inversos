@@ -1,9 +1,8 @@
 \contentsline {chapter}{\numberline {1}Introducción}{2}{}%
-\contentsline {section}{\numberline {1.1}Metodos proyectivos}{3}{}%
-\contentsline {subsection}{\numberline {1.1.1}Metodos de Krylov}{3}{}%
-\contentsline {subsection}{\numberline {1.1.2}Algoritmo de Arnoldi}{3}{}%
-\contentsline {subsection}{\numberline {1.1.3}Metodos Iterativos de Krylov}{3}{}%
+\contentsline {section}{\numberline {1.1}Metodos Iterativos}{2}{}%
+\contentsline {subsection}{\numberline {1.1.1}Metodos estandar}{2}{}%
+\contentsline {subsection}{\numberline {1.1.2}Metodos de Krylov}{2}{}%
+\contentsline {subsubsection}{Metodos de Proyeccion}{2}{}%
+\contentsline {subsection}{\numberline {1.1.3}Algoritmo de Arnoldi}{3}{}%
 \contentsline {subsubsection}{FOM}{3}{}%
 \contentsline {subsubsection}{GMRES}{3}{}%
-\contentsline {section}{\numberline {1.2}Motivación}{3}{}%
-\contentsline {section}{\numberline {1.3}De ... a vectores}{3}{}%
