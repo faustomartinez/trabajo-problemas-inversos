@@ -6,7 +6,7 @@
 \contentsline {subsubsection}{Método de Jacobi}{5}{}%
 \contentsline {subsubsection}{Método de Gauss-Seidel}{5}{}%
 \contentsline {subsection}{\numberline {1.1.2}Metodos de Krylov}{5}{}%
-\contentsline {subsubsection}{Metodos de Proyeccion}{5}{}%
-\contentsline {subsection}{\numberline {1.1.3}Algoritmo de Arnoldi}{5}{}%
-\contentsline {subsubsection}{FOM}{5}{}%
-\contentsline {subsubsection}{GMRES}{5}{}%
+\contentsline {subsection}{\numberline {1.1.3}Metodos de Proyección}{5}{}%
+\contentsline {subsection}{\numberline {1.1.4}Algoritmo de Arnoldi}{7}{}%
+\contentsline {subsubsection}{FOM}{7}{}%
+\contentsline {subsubsection}{GMRES}{7}{}%

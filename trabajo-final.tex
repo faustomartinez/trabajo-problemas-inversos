@@ -63,8 +63,48 @@ Partiendo de que $(L+D)x=-Ux+b$ es equivalente al sistema $Ax=b$, vemos que su f
 \ En general, podemos decir que las iteraciones de los métodos vienen dadas por $x_{n+1}=Bx_n+C$, y en el caso de Jacobi, $B_J=-D^{-1}(L+U)$ y $C_J=D^{-1}b$ y para Gauss-Seidel $B_{GS}=-(L+U)^{-1}U$ y $C_{GS}=(L+U)^{-1}b$. Tenemos que escribiendo de esta manera el método, para analizar la convergencia, basta con ver que $\rho(B)<1$.
 
 	\subsection{Metodos de Krylov}
-	\subsubsection{Metodos de Proyeccion}
-	\ J
+	\ no se a quien le toca xd
+	\subsection{Metodos de Proyección}
+Debido a la gran escala de las matrices y su mal condicionamiento, estos sistemas se suelen resolver a través de la proyección a subespacios de Krylov dimensión más pequeña. 
+
+En el apartado anterior, vimos que la solución $x$ está contenida en el subespacio afín $x_0 + \mathcal{K}_m(A, r_0)$. Naturalmente, esto nos lleva a pensar que la solución $x_n$ puede ser computada en el subespacio $x_0 + \mathcal{K}_n(A, r_0)$. Equivalentemente,
+\begin{center}
+	$x_n = x_0 + y_n, \quad  y_n \in \mathcal{K}_n(A, r_0)$
+\end{center}
+para $n \in \mathbb{N}$. Nuestro objetivo es encontrar la mejor combinación lineal de coeficientes para el subespacio de Krylov, con el fin de que a partir de una cierta iteración $m$, se obtenga la solución exacta (o suficientemente aproximada).
+
+Sea $x_0 \in \mathbb{C}^n$ un vector inicial y sea $r_0 := b - Ax_0$. El residuo correspondiente a la iteración $n$ está dado por:
+\begin{center}
+	$r_n := b - Ax_n = b - A(x_0 + y_n) = r_0 - Ay_n, \quad r_n\in \ \mathcal{K}_{n+1}(A, r_0)$
+\end{center}
+Para poder determinar la solución $x_n$ de manera óptima, se imponen ciertas restricciones, que suelen describir a partir de nociones de ortogonalidad. Estos son algunos de los enfoques:
+
+\begin{flushleft}
+	\textbf{Enfoque de Ritz-Galerkin}
+\end{flushleft}
+Para cada $n \in \mathbb{N}$, pedimos
+\begin{center}
+	$r_n \perp \mathcal{K}_{n}(A, r_0)$
+\end{center}
+\begin{flushleft}
+	\textbf{Enfoque de Petrov-Galerkin}
+\end{flushleft}
+Para este enfoque, pedimos que el residuo (definido previamente) sea ortogonal a un subespacio $\mathcal{L} \subset \mathbb{C}^{n}$ de dimensión $n$, es decir,
+\begin{center}
+	$r_n \perp \mathcal{L}_n$, con $dim(\mathcal{L}_n) = n$
+\end{center}
+\newtheorem{proposicion}{Proposición}
+\begin{proposicion}
+	El enfoque de Ritz-Galerkin es el enfoque de Petrov-Galerkin con la elección $\mathcal{L}_n = \mathcal{K}_{n}(A, r_0)$.
+\end{proposicion}
+Para poder representar este problema matricialmente, consideramos V = $[v_1, \ldots, v_m]$ y W = $[w_1, \ldots, w_m]$, cuyas columnas definen bases de $\mathcal{K}$ y $\mathcal{L}$ respectivamente. La solución aproximada $\tilde{x}$ ahora puede ser escrita como $\tilde{x} = x_0 + Vy, \quad y \in \mathbb{C}^n$. Si definimos $r := b - A\tilde{x}$, para que éste sea ortogonal a $\mathcal{L}$ pedimos:
+\begin{center}
+	$W^Tr = 0 \iff W^T(b - A\tilde{x}) = 0 \iff W^T(b - A(x_0 + Vy)) = 0 \iff \boxed{W^TAVy = W^Tr_0}$.
+\end{center}
+Si $W^TAV$ es inversible, entonces la aproximación está dada por:
+\begin{center}
+	$\tilde{x} = x_0 + V(W^TAV)^{-1}W^Tr_0$
+\end{center}
 	\subsection{Algoritmo de Arnoldi}
 	\subsubsection{FOM}
 	\ K
