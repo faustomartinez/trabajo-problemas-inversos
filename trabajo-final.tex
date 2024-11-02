@@ -1,6 +1,14 @@
 \documentclass[12pt, oneside]{book}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
+\usepackage{amssymb} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+\newtheorem*{definition}{Definición}
+\newtheorem*{proposition}{Proposición}
+\newtheorem*{theorem}{Teorema}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\renewcommand{\proofname}{Demostración}
 
 \title{Métodos iterativos para la solución de problemas inversos discretos}
 \author{Rivas Jazmin et. al.}
@@ -15,10 +23,45 @@
 	\ En este texto se pretende estudiar el problema de enfoque de imágenes. A partir de una imagen borrosa con ruido y una matriz de desenfoque, nuestro objetivo es encontrar nuestra imagen original utilizando su versión borrosa. Este problema se puede formular a través de un sistema lineal $Ax = b$, donde $A$ es la matriz de desenfoque, $b$ es el ruido y $x$ es la imagen a restaurar. Debido a su mal condicionamiento, nos interesan los métodos de regularización para la reconstrucción de las mismas. En particular, nos interesaremos por los métodos de regularización de Krylov. Estos métodos están basados en procesos de proyección sobre un tipo de subespacios muy particulares, de los cuales el método toma el nombre. Este capítulo servirá de introducción a la estructura general de esta clase de métodos.
 	
 	
-	\section{Metodos Iterativos}
-	\ A
-	\subsection{Metodos estandar}
-	\ A
+\section{Metodos Iterativos}
+\ Consideremos el problema lineal dado por el sistema $Ax = b$. Sabemos que existen métodos directos para la resolución de los mismos (descomposiciones QR, de Cholesky, PALU, entre otros), pero estos métodos traen consigo limitaciones. El primer obstáculo que nos podemos encontrar viene con la cantidad de operaciones que requieren y el tiempo computacional que inducen cuando la matriz $A$ sube de dimensión, la estructura que puede tener o incluso no tenerla de forma explícita y que venga en forma de operador lineal o función.
+
+\ A raíz de estas limitaciones con los métodos directos, surgen los métodos iterativos. La idea es que dado un sistema $Ax = b$ y un vector inicial $x_0$, el método produce una sucesión $\{x_n\}_{n \in \mathbb{N}}$ de soluciones del sistema que, dadas las condiciones necesarias, convergen a $x$.
+
+\ Para plantear un método, dado el sistema lineal y la matriz $A$, la reescribimos como $A=M+N$, lo que nos deja con el sistema: $$(M-N)x=b$$ El cual se traduce a: $$Mx=b+Nx$$ Y si resolvemos para $x$ tenemos que: $$x=M^{-1}(b+Nx)$$ Y de acá podemos deducir la fórmula recursiva de método: $$x_{n+1}=M^{-1}(b+Nx_{n})$$ Y si observamos que $N=M-A$ concluimos que: $$x_{n+1}=M^{-1}(b+(M-A)x_{n})=M^{-1}b+x_n-M^{-1}Ax_n$$ Luego, $$x_{n+1}=x_n+M^{-1}(b-Ax_n)$$ La cual es la fórmula general para cualquier método iterativo.
+
+\ Pero habíamos dicho que para asegurar que la sucesión $\{x_n\}_{n \in \mathbb{N}}$ generada por el método resultase convergente necesitábamos que se den ciertas condiciones, vamos a verlas:
+
+\subsubsection{Error de los métodos}
+\ Partiendo de la forma del método: $$x=M^{-1}b+(I-M^{-1}A)x$$ Tenemos que la forma iterativa viene dada por: $$x_{n+1}=M^{-1}b+(I-M^{-1}A)x_n$$ Y entonces tenemos que la diferencia entre iteraciones nos da el error del paso $n+1$: $$e_{n+1}=(I-M^{-1}A)e_n$$ Entonces si llamamos $B=I-M^{-1}A$ tenemos que: $$e_{n+1}=Be_n=BBe_{n-1}=\dots=B^{n+1}e_0$$ Y por lo tanto tenemos que: $$\norm{e_{n+1}} \leq \norm{B}^{n+1}\norm{e_0}$$
+\ Notemos que si $\norm{B}<1$, entonces $\norm{e_n}\xrightarrow{n \xrightarrow{} \infty}0$.
+
+\subsubsection{Convergencia de los métodos}
+\begin{definition}
+	Decimos que un método iterativo converge si para todo $x_0 \in \mathbb{R}^n$ existe $x$ tal que: $$\lim_{n \to \infty}x_n=x$$
+\end{definition}
+
+\begin{theorem}
+	Sea $A \in \mathbb{R}^{nxn}$, entonces: $$\rho(A)=\inf_{\norm{\cdot}}\norm{A}$$
+\end{theorem}
+
+\begin{theorem}
+	Sea $A \in \mathbb{R}^{nxn}$, entonces: $$A^n \xrightarrow{n \xrightarrow{} \infty}0 \iff \rho(A)<1$$ 
+\end{theorem}
+
+\begin{theorem}
+	Dado el sistemla lineal $Ax=b$, consideremos el método iterativo: $$x_{n+1}=M^{-1}b+(I-M^{-1}A)x_n$$ y sea $B=I-M^{-1}A$, entonces el método converge si y solo si $\rho(B)<1$.
+\end{theorem}
+
+\subsection{Métodos estandar}
+\ Habíamos quedado en que un método iterativo viene dado por la fórmula recursiva $$x_{n+1}=x_n+M^{-1}(b-Ax_n)$$ Pero para poder hacer esto, necesitábamos descomponer nuestra matriz $A$ y toda la iteración iba a depender de eso.
+\ Dado un sistema lineal, podemos descomponer a su matriz $A$ como $A=L+D+U$, con $L$ su parte triangular inferior estricta, $D$ su diagonal y $U$ como su parte triangular su parte triangular superior estricta. Y tenemos que $$Ax=b \iff Dx=-(L+U)x+b \iff (L+D)x=-Ux+b$$ Con esto podemos definir los dos métodos iterativos más comunes.
+\subsubsection{Método de Jacobi}
+Sabiendo que $Dx=-(L+U)x+b$, podemos escribir la forma recursiva como: $$Dx_{n+1}=-(L+U)x_n+b$$ Y esto nos dice que: $$x_{n+1}=-D^{-1}(L+U)x_n+D^{-1}b$$ Y esta es la iteración del método de Jacobi.
+\subsubsection{Método de Gauss-Seidel}
+Partiendo de que $(L+D)x=-Ux+b$ es equivalente al sistema $Ax=b$, vemos que su forma recurisva está dada por: $$(L+D)x_{n+1}=-Ux_n+b$$ Y esto lo podemos reescribir como: $$x_{n+1}=-(L+U)^{-1}Ux_n+(L+U)^{-1}b$$ Que es la iteración del método de Gauss-Seidel.
+\ En general, podemos decir que las iteraciones de los métodos vienen dadas por $x_{n+1}=Bx_n+C$, y en el caso de Jacobi, $B_J=-D^{-1}(L+U)$ y $C_J=D^{-1}b$ y para Gauss-Seidel $B_{GS}=-(L+U)^{-1}U$ y $C_{GS}=(L+U)^{-1}b$. Tenemos que escribiendo de esta manera el método, para analizar la convergencia, basta con ver que $\rho(B)<1$.
+
 	\subsection{Metodos de Krylov}
 	\subsubsection{Metodos de Proyeccion}
 	\ J
