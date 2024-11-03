@@ -34,6 +34,7 @@
 
 \subsubsection{Error de los métodos}
 \ Partiendo de la forma del método: $$x=M^{-1}b+(I-M^{-1}A)x$$ Tenemos que la forma iterativa viene dada por: $$x_{n+1}=M^{-1}b+(I-M^{-1}A)x_n$$ Y entonces tenemos que la diferencia entre iteraciones nos da el error del paso $n+1$: $$e_{n+1}=(I-M^{-1}A)e_n$$ Entonces si llamamos $B=I-M^{-1}A$ tenemos que: $$e_{n+1}=Be_n=BBe_{n-1}=\dots=B^{n+1}e_0$$ Y por lo tanto tenemos que: $$\norm{e_{n+1}} \leq \norm{B}^{n+1}\norm{e_0}$$
+
 \ Notemos que si $\norm{B}<1$, entonces $\norm{e_n}\xrightarrow{n \xrightarrow{} \infty}0$.
 
 \subsubsection{Convergencia de los métodos}
@@ -55,15 +56,25 @@
 
 \subsection{Métodos estandar}
 \ Habíamos quedado en que un método iterativo viene dado por la fórmula recursiva $$x_{n+1}=x_n+M^{-1}(b-Ax_n)$$ Pero para poder hacer esto, necesitábamos descomponer nuestra matriz $A$ y toda la iteración iba a depender de eso.
+
 \ Dado un sistema lineal, podemos descomponer a su matriz $A$ como $A=L+D+U$, con $L$ su parte triangular inferior estricta, $D$ su diagonal y $U$ como su parte triangular su parte triangular superior estricta. Y tenemos que $$Ax=b \iff Dx=-(L+U)x+b \iff (L+D)x=-Ux+b$$ Con esto podemos definir los dos métodos iterativos más comunes.
 \subsubsection{Método de Jacobi}
 Sabiendo que $Dx=-(L+U)x+b$, podemos escribir la forma recursiva como: $$Dx_{n+1}=-(L+U)x_n+b$$ Y esto nos dice que: $$x_{n+1}=-D^{-1}(L+U)x_n+D^{-1}b$$ Y esta es la iteración del método de Jacobi.
 \subsubsection{Método de Gauss-Seidel}
 Partiendo de que $(L+D)x=-Ux+b$ es equivalente al sistema $Ax=b$, vemos que su forma recurisva está dada por: $$(L+D)x_{n+1}=-Ux_n+b$$ Y esto lo podemos reescribir como: $$x_{n+1}=-(L+U)^{-1}Ux_n+(L+U)^{-1}b$$ Que es la iteración del método de Gauss-Seidel.
-\ En general, podemos decir que las iteraciones de los métodos vienen dadas por $x_{n+1}=Bx_n+C$, y en el caso de Jacobi, $B_J=-D^{-1}(L+U)$ y $C_J=D^{-1}b$ y para Gauss-Seidel $B_{GS}=-(L+U)^{-1}U$ y $C_{GS}=(L+U)^{-1}b$. Tenemos que escribiendo de esta manera el método, para analizar la convergencia, basta con ver que $\rho(B)<1$.
 
-	\subsection{Metodos de Krylov}
-	\ no se a quien le toca xd
+\ En general, podemos decir que las iteraciones de los métodos vienen dadas por $x_{n+1}=Bx_n+C$, y en el caso de Jacobi, $B_J=-D^{-1}(L+U)$ y $C_J=D^{-1}b$ y para Gauss-Seidel $B_{GS}=-(L+U)^{-1}U$ y $C_{GS}=(L+U)^{-1}b$.
+
+\subsection{Métodos de Krylov}
+\begin{definition}
+	Dada $A$ una matriz y $v, Av, \dots , A^{m-1}v \in \mathbb{C}^m$ vectores linealmente independientes, llamamos subespacio de Krylov de dimensión $m$ a: $$\mathcal{K}_{m}(A, v) = \langle v, Av, \ldots, A^{m-1}v \rangle$$
+\end{definition} 
+\ Los métodos de Krylov son métodos iterativos que utilizan subespacios de Krylov que, dado $x_0$ una aproximación inicial de la solución del sistema, se define el subespacio $\mathcal{K}_{m}(A, r_0)$, con $r_0=b-Ax_0$.
+
+\ Para entender de donde surge la idea de utilizar subpesacios de Krylov, notemos que dado la solución $x_{true}=A^{-1}b$ y $x_0$ una aproximación inicial para el método, resolver el sistema original es equivalente a resolver $Az=r_0$ si $z=x_{true}-x_0$. Sea $p(x)$ el polinomio de menor grado $i$ tal que $p(A)r_0=0$. Por el teorema de Cayley-Hamilton, tenemos que $i\leq n$. Entonces tenemos que: $$p(A)=a_0+Aa_1+\dots+a_{i-1}A^{i-1}+a_iA^i=0$$ Por lo que vale que $$A^{-1}a_0=-(a_1I+a_2A+\dots+a_{i-1}A^{i-2}+a_iA^{i-1})$$ Y si multiplicamos por $r_0$ tenemos que: $$z=A^{-1}r_0=-\frac{1}{a_0}(a_1I+a_2A+\dots+a_{i-1}A^{i-2}+a_iA^{i-1})r_0$$ Por lo que $$z\in \langle r_0,Ar_0,\dots,A^{i-1}r_0 \rangle = \mathcal{K}_{m}(A, r_0)$$ o bien, $$x_{true} \in x_0 + \mathcal{K}_{m}(A, r_0).$$
+
+\ Así nos podemos convencer que la formulación de un subespacio de Krylov para resolver sistemas liniales sale naturalmente de entender el problema.
+
 	\subsection{Metodos de Proyección}
 Debido a la gran escala de las matrices y su mal condicionamiento, estos sistemas se suelen resolver a través de la proyección a subespacios de Krylov dimensión más pequeña. 
 
