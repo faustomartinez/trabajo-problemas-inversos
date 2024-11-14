@@ -1,0 +1,4 @@
+*.aux
+*.syntax
+*.toc
+*.log

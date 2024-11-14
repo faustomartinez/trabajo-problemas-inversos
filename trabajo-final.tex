@@ -4,6 +4,10 @@
 \usepackage{amssymb} 
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
 \newtheorem*{definition}{Definición}
 \newtheorem*{proposition}{Proposición}
 \newtheorem*{theorem}{Teorema}
@@ -116,14 +120,82 @@ Si $W^TAV$ es inversible, entonces la aproximación está dada por:
 \begin{center}
 	$\tilde{x} = x_0 + V(W^TAV)^{-1}W^Tr_0$
 \end{center}
-	\subsection{Algoritmo de Arnoldi}
-	\subsubsection{FOM}
-	\ K
-	\subsubsection{GMRES}
-	\ K
+
+\subsection{Arnoldi}
+
+A veces es útil hallar una base ortonormal para un metodo iterativo, pues uno espera que de esta forma se elimine 'informacion redundante' ahorrando asi costo computacional. Una manera de hallar una base ortonormal en un espacio de Krilov $\mathcal{K}_m$ es con el metodo de Arnoldi.
 	
+	\begin{algorithm}
+		\caption{Arnoldi}
+		\begin{itemize}
+			\item Comenzamos con $v_1 = \frac{v}{\|v\|}$.
+			\item \textbf{for} $j \in \{1, 2, \dots, i\}$
+			\begin{itemize}
+				\item Computamos $h_{ij} = v_i^TAv_j$ para $i \in \{1, 2, \dots, j\}$
+				\item $w_j = Av_j - \sum_{i=1}^j h_{ij} v_i$
+				\item $h_{j+1,j} = \|w_j\|_2$
+				\item \textbf{if} $h_{j+1,j} = 0$ \textbf{then} Stop
+			\end{itemize}
+			\item $v_{j+1} = w_j / h_{j+1,j}$
+		\end{itemize}
+	\end{algorithm}
 	
-	Fausto implementa algo medio copado c:
+	Si denotamos a $V_i$ a la matriz de tamano $n\times i$ que tiene a los vectores $v_1, ..., v_i$ como columnas, a $H_i$ como la matriz de Hessemberg de tamano $(i+1)\times i$ cuyos elementos no nulos son los $h_{ij}$ descritos en el algoritmo de Arnoldi, entonces se verifica que: $$AV_j=V_{j+1}H_i$$
+	
+	\textcolor{red}{Anadir que es una matriz de Hessemberg}
+	
+\subsection{GMRES}
+	Una forma novedosa de resolver un sistema lineal usando métodos iterativos, es intentar minimizar la norma de un vector residual, donde se define un residuo inicial $r_0=b-Ax_0$ y se busca $x$ de modo que se minimice $J(y)=||b-Ax||_2$.
+	
+	El metodo GMRES (Generalized Minimal Residual Method) aprovecha esta idea, minimizando en cada paso un vector residual proyectado sobre un subespacio de Krylov a traves de sus componentes ortonormales. 
+	
+	Para deducir el metodo, hagamos un par de observaciones.
+	
+	Consideremos $\mathcal{K}_m$ y un vector inicial $x_0$. luego cualquier vector en $x_i\in\mathcal{K}_m+x_0$ se escribe como $$x=x_0+V_my$$
+	Donde $V_m$ es la misma matriz definida en el método de Arnoldi, e $y$ es un vector de tamaño $m$. Sean $\beta = ||r_0||_2$ y $v_1=\frac{r_0}{||r_0||_2}$, y teniendo en cuenta la igualdad en el metodo de Arnoldi, podemos reescribir el problema a minimizar como:
+	\begin{equation*}
+		\begin{split}
+			b-Ax&=b-A(x_0+V_my)\\
+			`    &= r_0-AV_my\\
+			&= \beta v_1-V_{m+1}H_my\\
+			&= V_{m+1}(\beta e_1 - H_my)
+		\end{split}
+	\end{equation*}
+	Luego 
+	\begin{equation*}
+		\begin{split}
+			J(y)&=||b-Ax_i||_2\\
+			&=||V_{m+1}(\beta e_1 - H_my_m)||_2    
+		\end{split}
+	\end{equation*}
+	y como los vectores columna de $V_{m+1}$ son ortonormales, entonces:
+	$$J(y)=||\beta e_1 - H_my||_2$$
+	
+	Entonces el problema se reduce a resolver un problema de mínimos cuadrados de tamaño $(m+1)\times m$, que es menos demandante computacionalmente que el problema original. El poder de GMRES reside en que bajamos la dimension del problema original considerablemente, sin embargo el algoritmo no provee una solucion explicita en cada paso, sino que hace falta calcularla en intervalos regulares. (En realidad hay varias formas de resolver esta deficiencia del algoritmo, pero no es el objetivo de este trabajo[Iterative Methods Yousef Saad]).
+	\begin{algorithm}
+		\caption{Algoritmo GMRES}
+		\begin{algorithmic}[1]
+			\STATE \textbf{Dada} $\mathbf{A} \in \mathbb{R}^{n \times n}$, $\mathbf{b} \in \mathbb{R}^n$, $\mathbf{x}^{(0)}$, calcular $\mathbf{r}^{(0)} = \mathbf{b} - \mathbf{A} \mathbf{x}^{(0)}$
+			\STATE $\mathbf{v}_1 = \frac{\mathbf{r}^{(0)}}{\|\mathbf{r}^{(0)}\|}$
+			\FOR{$k = 1, 2, \dots, m$}
+			\STATE Calcular $\mathbf{w_k} = \mathbf{A} \mathbf{v}_k$
+			\FOR{$j = 1, \dots, k$}
+			\STATE $h_{jk} = \mathbf{w}^T \mathbf{v}_j$
+			\STATE $\mathbf{w_k} := \mathbf{w_k} - h_{jk} \mathbf{v}_j$
+			\ENDFOR
+			\STATE $h_{k+1,k} = \|\mathbf{w_k}\|$
+			\IF{$h_{k+1,k} \neq 0$}
+			\STATE $\mathbf{v}_{k+1} = \frac{\mathbf{w_k}}{h_{k+1,k}}$
+			\ENDIF
+			\ENDFOR
+			\STATE Resolver el problema de mínimos cuadrados $\min_y \|\beta \mathbf{e}_1 - \mathbf{H}_k y\|_2$
+			\STATE Actualizar la solución: $\mathbf{x}^{(k)} = \mathbf{x}^{(0)} + \mathbf{V}_k y$
+			\IF{$\|\mathbf{r}^{(k)}\| <$ tolerancia}
+			\STATE Romper el ciclo
+			\ENDIF
+		\end{algorithmic}
+	\end{algorithm}
+	
 	
 \end{document}
 	
