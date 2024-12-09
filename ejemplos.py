@@ -36,7 +36,7 @@ def construir_A(propagacion, dimensiones):
 
     for i in range(m):
         for j in range(n):
-            column = funciones.vec(funciones.P(propagacion, [i,j], dimensiones))
+            column = funciones.vectorizar(funciones.P(propagacion, [i,j], dimensiones))
             A[:, contador] = column
             contador += 1
     factor_normalizacion = np.sum(A[:, int(m*n/2 + n/2)])
