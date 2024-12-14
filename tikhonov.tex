@@ -1,0 +1,25 @@
+\documentclass[12pt, oneside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\title{Métodos iterativos para la solución de problemas inversos discretos}
+\author{Rivas Jazmin et. al.}
+\date{}
+
+\begin{document}
+	\maketitle
+	\tableofcontents
+	
+	
+	\chapter{Regularización de Tikhonov}
+	La regularización es una técnica utilizada para poder resolver sistemas lineales de la forma $Ax = b$. Como vimos, en el área de procesamiento de imágenes este problema está mal condicionado. Es por esta misma razón que se decide añadir un término regularizante.
+	La regularización de Tikhonov es una de las más comúnmente utilizadas. En su presentación más simple, se busca resolver \\[10pt]
+	 \begin{equation}
+	 	\min_{x} \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda \| \mathbf{x} \|_2^2 \right)
+	 \end{equation}
+	 donde $\lambda \geq 0$ es un parámetro de regularización a determinar.
+	 
+\end{document}
