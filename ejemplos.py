@@ -44,16 +44,34 @@ def construir_A(propagacion, dimensiones):
 
     return A
 
-# Definimos una función para la transformada de Haar
-def Haar_Wavelet_transform(n):
-    W = np.zeros((n,n))
-    knt = 0
-    for k in range (0, int(n/2)):
-        W[k][knt] = 1
-        W[k][knt+1] = 1
-        W[k+int(n/2)][knt] = 1
-        W[k+int(n/2)][knt+1] = -1
-        knt=knt+2
-    W=(1/np.sqrt(2))*W
-    W1 = W[0:int(n/2),:]
-    return W1
+
+def construir_mate():
+    size = 64
+    imagen = np.zeros((size, size))
+
+    # Coordenadas y dimensiones para el cuerpo del mate
+    centro_x, centro_y = size // 2, size // 2
+    radio_cuerpo = size // 3
+    altura_cuerpo = size // 4
+
+    # Dibujar el cuerpo del mate (parte inferior redondeada)
+    for i in range(size):
+        for j in range(size):
+            if (i - (centro_x + altura_cuerpo // 2)) ** 2 + (j - centro_y) ** 2 <= radio_cuerpo ** 2 and i >= centro_x - altura_cuerpo:
+                imagen[i, j] = 1
+
+    # Dibujar la boca del mate (rectángulo horizontal en la parte superior, más angosta)
+    for i in range(centro_x - altura_cuerpo, centro_x - altura_cuerpo + 5):
+        for j in range(centro_y - radio_cuerpo // 2, centro_y + radio_cuerpo // 2):
+            imagen[i, j] = 1
+
+    # Dibujar la bombilla (línea diagonal ligeramente más gruesa del centro hacia arriba derecha)
+    for i in range(centro_x - altura_cuerpo, centro_x - altura_cuerpo - 15, -1):
+        for j_offset in range(-2, 3):  # Grosor adicional
+            j = centro_y + (centro_x - altura_cuerpo - i) // 2 + j_offset
+            if 0 <= j < size:
+                imagen[i, j] = 1
+
+    x_exacto = funciones.vectorizar(imagen)
+    return x_exacto
+
