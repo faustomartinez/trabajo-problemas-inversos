@@ -5,6 +5,12 @@
 \usepackage{amsmath}
 \usepackage{amsthm}
 \usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{float}
+\captionsetup[figure]{name=Ejemplo}
+\renewcommand{\proofname}{Demostración}
 \title{Métodos iterativos para la solución de problemas inversos discretos}
 \author{Rivas Jazmin et. al.}
 \date{}
@@ -18,37 +24,32 @@
 	La regularización es una técnica utilizada para poder resolver sistemas lineales de la forma $Ax = b$. Como vimos, en el área de procesamiento de imágenes este problema está mal condicionado. Es por esta misma razón que se decide añadir un término regularizante, para poder encontrar una solución más útil y estable del problema en cuestión.
 	La regularización de Tikhonov es una de las más comúnmente utilizadas. En su presentación más simple, se busca resolver \\[10pt]
 	 \begin{equation}
-	 	\min_{x} \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda \| \mathbf{x} \|_2^2 \right)
+	 	\min_{x} \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda^2 \| \mathbf{x} \|_2^2 \right)
 	 \end{equation}
 	 donde $\lambda > 0$ es un parámetro de regularización a determinar.
-	 Si se define $\phi(x) = \|Ax - b\|^2 + \lambda \|x\|^2$, resolviendo para el producto interno dado y derivando sobre el funcional, se tiene que:
+	 Si se define $\phi(x) = \|Ax - b\|^2 + \lambda^2 \|x\|^2$, resolviendo para el producto interno dado y derivando sobre el funcional, se tiene que:
 	 \[
-	 	\nabla \phi(x) = 2A^T(Ax - b) + 2\lambda x = 0 \iff 
-	 	\boxed{(A^TA + \lambda \mathrm{Id})x = A^Tb}
+	 	\nabla \phi(x) = 2A^T(Ax - b) + 2\lambda^2 x = 0 \iff 
+	 	\boxed{(A^TA + \lambda^2 \mathrm{Id})x = A^Tb}
 	 \]
 	 
 	 A medida que $\lambda$ crece, la solución pasará a tener normas residuales más grandes, mientras que si $\lambda$ decrece, el efecto es el opuesto.
-	 AGREGAR EL GRAFICO DE LA PAGINA 3 DEL DOCUMENTO L CURVE
-	 
-	 \subsection{Regularización de Tikhonov Generalizada}
+	
+	\subsection{Regularización de Tikhonov Generalizada}
 	 En general, se suele pedir que la solución minimice cierta cantidad 
 	 \[
 	 \Omega(x) = \| L(x) \|_2
 	 \]
 	 donde $L$ usualmente suele ser la identidad o algún operador de derivación de primer o segundo orden.
-	 Si además conocemos un estimador inicial de la solución $x^*$, se lo puede incluir en las restricciones:
-	\[
-	\Omega(x) = \| L(x - x^*) \|^2.
-	\]
 	Al introducir este nuevo parámetro $\Omega (x)$ se busca encontrar un equilibrio entre la minimización de la norma residual  $\| \mathbf{A}x - \mathbf{b} \|_2^2$ y la de $\Omega (x)$. En definitiva, se plantea encontrar:
-	 \begin{equation}
-		\min \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda \| \mathbf{L(x - x^*)} \|_2^2 \right)
-	\end{equation}
-	cuya solución cumple: 
-	\[
-	{(A^TA + \lambda \mathrm{L^TL})x = A^Tb}
+	 \[
+		\min \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda^2 \| \mathbf{L(x)} \|_2^2 \right)
 	\]
-	 Nuevamente, la elección del regularizador $\lambda$ es extremadamente importante, lo que nos lleva a pensar... ¿Existe algún método optimización de elección de este parámetro?
+	cuya solución cumple: 
+	\begin{equation}
+	\boxed{x_\lambda = (A^TA + \lambda^2 \mathrm{L^TL})^{-1}  A^Tb}
+	\end{equation}
+	 Nuevamente, la elección del regularizador $\lambda$ es extremadamente importante, lo que nos lleva a pensar... ¿Existe algún método de optimización de elección de este parámetro?
 	
 	\subsection{Descomposición SVD}
 	La Descomposición en Valores Singulares (SVD, por sus siglas en inglés) es una técnica de factorización de matrices muy popular y ampliamente utilizada. Dada una matriz $A \in \mathbb{R}^{m \times n}$, ésta puede ser descompuesta en tres matrices:
@@ -80,6 +81,47 @@
 	\end{enumerate}
 	
 	\subsection{Curva L}
-	 
-	 
+	Existen varios métodos para determinar el valor del regularizador. Entre ellos se encuentra la Curva L.
+	Habiendo entendido la importancia que juegan la norma residual y la de la solución, resulta natural graficarlas como una curva, i.e.
+	\[
+	L(\lambda) := \{(\phi (\| x_\lambda  \|^2), \phi (\| \mathbf{A}x_\lambda - \mathbf{b} \|^2) ): \lambda > 0\}
+	\]
+	siendo $\phi$ una función monótona creciente. En general, suele tomarse $\phi(t) = \log(t)$ o $\phi(t) = t$
+	\newtheorem{proposition}{Proposición}
+	\begin{proposition}
+	Sean $q(\lambda) = \phi (\| x_\lambda  \|^2)$ y $s(\lambda) = \phi (\| \mathbf{A}x_\lambda - \mathbf{b} \|^2 )$, con $L = \mathrm{Id}$ y $\phi$ una función diferenciable y monótona creciente. Entonces $q(\lambda)$ es una función decreciente y $s(\lambda)$ es creciente en función de $\lambda$.
+	\end{proposition}
+	\begin{proof}
+	Sea $A = U \Sigma V^T$ la descomposición en valores singulares de $A$. Luego, las normas de la solución regularizada $x_\lambda$ y del residuo vienen dadas por
+	\begin{equation}
+		x_\lambda = \sum_{i=1}^{n} f_i\, \frac{u_i^T b}{\sigma_i} v_i, \quad f_i = \frac{\sigma_i^2}{ \sigma_i^{2} + \lambda^2}
+	\end{equation}
+	\begin{equation}
+		b - Ax_\lambda = \sum_{i=1}^{n} (1-f_i)u_i^Tb\,u_i + b_0
+	\end{equation}	
+	con $b_0 = b - \sum_{i=1}^{n} u_i \, u_i^T b$ y $1 - f_i = \frac{\lambda^2}{\sigma^2 + \lambda^2}$. De aquí se sigue automáticamente el resultado de la proposición.	
+	\end{proof}
+	Para las matrices $A$ que surgen de la discretización de problemas inversos, los valores singulares decaen gradualmente a 0, y los cambios de signo en los vectores singulares suele aumentar a medida que $i$ aumenta. Es decir, cuanto más cercano a 0 esté el valor singular $\sigma_i$, más oscilatorios son los vectores singulares $u_i$ y $v_i$. Consideremos ahora:
+	\[
+	\eta = \| x_\lambda \|_2^2 = \sum_{i=1}^{n} (f_i\frac{u_i^T b}{\sigma_i})^2
+	\]
+	\[
+	 \rho = \|Ax_\lambda - b\|_2^2 =  \sum_{i=1}^{n} ((1-f_i)u_i^Tb)^2
+	\]
+	El punto de máxima curvatura está dado por la siguiente fórmula:
+	\[
+	\hat{\eta} = \log(\eta), \quad \hat{\rho} =\log{\rho}
+	\]
+	\[
+	k(\lambda) =\frac{ \hat{\eta}^{\prime\prime}\hat{\rho}^{\prime} -  \hat{\eta}^{\prime} \hat{\rho}^{\prime\prime}}{((\hat{\rho}^{\prime})^2 + (\hat{\eta}^{\prime})^2)^{\frac{3}{2}}}
+	\]
+	donde prima denota la diferenciación con respecto a $\lambda$.
+	
+	En el gráfico de la Curva L, la porción horizontal corresponde a las soluciones donde el regularizador es muy grande y la solución está dominada por los errores de regularización. Por el contrario, la porción vertical corresponde a las soluciones donde el parámetro de regularización es muy pequeño y la solución está dominada por los errores provenientes de la división por valores singulares que tienden a 0. Por esto mismo, se considera que un término regularizante óptimo es aquel que se encuentra en el "codo" del gráfico de esta curva. Ver ejemplo $(1.1)$.
+	\begin{figure}[H] 
+		\centering 
+		\includegraphics[width=0.5\linewidth]{imagenes/Curva L.png}
+		\caption{Curva L correspondiente al problema regularizado.}
+	\end{figure}
+
 \end{document}
