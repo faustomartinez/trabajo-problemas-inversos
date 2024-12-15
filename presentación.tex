@@ -1,0 +1,90 @@
+\documentclass[12pt]{beamer}
+
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+
+\title{Métodos iterativos para la solución de problemas inversos discretos}
+
+\author{Jazmín Rivas, Kevin Luna, Fausto Martinez, Aaron Klarreich}
+\date{Martes 17 de diciembre}
+
+\begin{document}
+	
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	\section{Introducción} 
+	% En esta sección va a ir Motivación, Métodos iterativos (definiciones, formula, Jacobi/G-S, etc).
+	
+	\begin{frame}{Motivación}
+		
+		\ En este texto se pretende estudiar el problema de enfoque de imágenes. A partir de una imagen borrosa con ruido y una matriz de desenfoque, nuestro objetivo es encontrar nuestra imagen original utilizando su versión borrosa. Este problema se puede formular a través de un sistema lineal $Ax = b$, donde $A$ es la matriz de desenfoque, $b$ es el ruido y $x$ es la imagen a restaurar. Debido a su mal condicionamiento, nos interesan los métodos de regularización para la reconstrucción de las mismas. En particular, nos interesaremos por los métodos de regularización de Krylov. Estos métodos están basados en procesos de proyección sobre un tipo de subespacios muy particulares, de los cuales el método toma el nombre. Este capítulo servirá de introducción a la estructura general de esta clase de métodos.
+		
+	\end{frame}
+	
+	\begin{frame}{Métodos Iterativos}
+		
+		\ Ante las limitaciones que traen los métodos de resolucón de problemas del estilo $Ax = b$, los métodos iterativos buscan superar los problemas de estos métodos para producir soluciones a estos sistemas. \\
+		\ Si consideramos $A = M-N$, tenemos que: $$(M-N)x = b$$ o bien: $$x = M^{-1}(b+Nx)$$ lo que nos da la fórmula recursiva $$x_{n+1} = M^{-1}(b+Nx_n)$$
+		
+	\end{frame}
+	
+	\begin{frame}{Métodos Estandar}
+		
+		\ Partiendo de la forma $x_{n+1} = M^{-1}(b+Nx_n)$, si tomamos $N = M-A$ tenemos que: $$x_{n+1}=M^{-1}(b+(M-A)x_{n})=M^{-1}b+x_n-M^{-1}Ax_n$$ luego, $$x_{n+1}=x_n+M^{-1}(b-Ax_n)$$ La cual es la fórmula general para cualquier método iterativo. Más aún, si descomponemos a $A$ como $A = L+D+U$ como sus partes \textit{lower}, \textit{diagonal} y \textit{upper} podemos definir los métodos iterativos más comunes.
+		
+	\end{frame}
+	
+	\begin{frame}{Método de Jacobi}
+		
+		\ Como $A = L+D+U$, tenemos que $$Ax=b \iff Dx=-(L+U)x+b$$ con lo que podemos escribir la forma recursiva como: $$Dx_{n+1}=-(L+U)x_n+b$$ y esto nos dice que: $$x_{n+1}=-D^{-1}(L+U)x_n+D^{-1}b$$ la cual es la iteración del método de Jacobi.
+		
+	\end{frame}
+	
+	\begin{frame}{Método de Gauss-Seidel}
+		
+		\ De la misma forma, podemos decir que $$Ax=b \iff (L+D)x=-Ux+b$$ y nos induce la forma recurisva $$(L+D)x_{n+1}=-Ux_n+b$$ que podemos reescribir como la iteración del método de Gauss-Seidel: $$x_{n+1}=-(L+U)^{-1}Ux_n+(L+U)^{-1}b$$ \\
+		\ En general, podemos decir que las iteraciones de los métodos vienen dadas por $x_{n+1}=Bx_n+C$, y en el caso de Jacobi, $B_J=-D^{-1}(L+U)$ y $C_J=D^{-1}b$ y para Gauss-Seidel $B_{GS}=-(L+U)^{-1}U$ y $C_{GS}=(L+U)^{-1}b$.
+		
+	\end{frame}
+	
+	\section{Teoría}
+	% Acá va a ir todo lo de Krylov, métodos de proyección, Arnoldi, GMRES, LSQR, Tikhonov, etc. 
+	
+	\begin{frame}{Métodos de Krylov}
+		
+		\begin{definition}
+			Dada $A$ una matriz y $v, Av, \dots , A^{m-1}v \in \mathbb{C}^m$ vectores linealmente independientes, llamamos subespacio de Krylov de dimensión $m$ a: $$\mathcal{K}_{m}(A, v) = \langle v, Av, \ldots, A^{m-1}v \rangle$$
+		\end{definition} 
+		Los métodos de Krylov son métodos iterativos que utilizan subespacios de Krylov que, dado $x_0$ una aproximación inicial de la solución del sistema, se define el subespacio $\mathcal{K}_{m}(A, r_0)$, con $r_0=b-Ax_0$.
+		
+	\end{frame}
+	
+	\begin{frame}{Motivación del Método}
+		
+		\ Notemos que la idea de utilizar subespacios de Krylov para resolver problemas lineales surge naturalmente de entender el problema, pues dada la solución $x_{true}=A^{-1}b$ y $x_0$ una aproximación inicial para el método, resolver el sistema original es equivalente a resolver $Az=r_0$ si $z=x_{true}-x_0$. \\ Sea $p(x)$ el polinomio de menor grado $i$ tal que $p(A)r_0=0$. Por el teorema de Cayley-Hamilton, tenemos que $i\leq n$. Entonces tenemos que: $$p(A)=a_0+Aa_1+\dots+a_{i-1}A^{i-1}+a_iA^i=0$$ 
+		
+	\end{frame}
+	
+	\begin{frame}{Motivación del Método}
+		
+		Por lo que vale que $$A^{-1}a_0=-(a_1I+a_2A+\dots+a_{i-1}A^{i-2}+a_iA^{i-1})$$ Y si multiplicamos por $r_0$ tenemos que: $$z=A^{-1}r_0=-\frac{1}{a_0}(a_1I+a_2A+\dots+a_{i-1}A^{i-2}+a_iA^{i-1})r_0$$ Por lo que $$z\in \langle r_0,Ar_0,\dots,A^{i-1}r_0 \rangle = \mathcal{K}_{m}(A, r_0)$$ o bien, $$x_{true} \in x_0 + \mathcal{K}_{m}(A, r_0).$$
+		
+	\end{frame}
+	
+	\begin{frame}{Métodos de Proyección}
+		
+		
+	\end{frame}
+	
+	\section{Implementación}
+	% Acá va a ir todo lo de Faus, código, implementaciones, ejemplos, bla bla
+	
+	
+	
+	
+\end{document}

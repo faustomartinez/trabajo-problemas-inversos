@@ -1,0 +1,85 @@
+\documentclass[12pt, oneside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb} 
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{pgfplots}
+\title{Métodos iterativos para la solución de problemas inversos discretos}
+\author{Rivas Jazmin et. al.}
+\date{}
+
+\begin{document}
+	\maketitle
+	\tableofcontents
+	
+	
+	\chapter{Regularización de Tikhonov}
+	La regularización es una técnica utilizada para poder resolver sistemas lineales de la forma $Ax = b$. Como vimos, en el área de procesamiento de imágenes este problema está mal condicionado. Es por esta misma razón que se decide añadir un término regularizante, para poder encontrar una solución más útil y estable del problema en cuestión.
+	La regularización de Tikhonov es una de las más comúnmente utilizadas. En su presentación más simple, se busca resolver \\[10pt]
+	 \begin{equation}
+	 	\min_{x} \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda \| \mathbf{x} \|_2^2 \right)
+	 \end{equation}
+	 donde $\lambda > 0$ es un parámetro de regularización a determinar.
+	 Si se define $\phi(x) = \|Ax - b\|^2 + \lambda \|x\|^2$, resolviendo para el producto interno dado y derivando sobre el funcional, se tiene que:
+	 \[
+	 	\nabla \phi(x) = 2A^T(Ax - b) + 2\lambda x = 0 \iff 
+	 	\boxed{(A^TA + \lambda \mathrm{Id})x = A^Tb}
+	 \]
+	 
+	 A medida que $\lambda$ crece, la solución pasará a tener normas residuales más grandes, mientras que si $\lambda$ decrece, el efecto es el opuesto.
+	 AGREGAR EL GRAFICO DE LA PAGINA 3 DEL DOCUMENTO L CURVE
+	 
+	 \subsection{Regularización de Tikhonov Generalizada}
+	 En general, se suele pedir que la solución minimice cierta cantidad 
+	 \[
+	 \Omega(x) = \| L(x) \|_2
+	 \]
+	 donde $L$ usualmente suele ser la identidad o algún operador de derivación de primer o segundo orden.
+	 Si además conocemos un estimador inicial de la solución $x^*$, se lo puede incluir en las restricciones:
+	\[
+	\Omega(x) = \| L(x - x^*) \|^2.
+	\]
+	Al introducir este nuevo parámetro $\Omega (x)$ se busca encontrar un equilibrio entre la minimización de la norma residual  $\| \mathbf{A}x - \mathbf{b} \|_2^2$ y la de $\Omega (x)$. En definitiva, se plantea encontrar:
+	 \begin{equation}
+		\min \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda \| \mathbf{L(x - x^*)} \|_2^2 \right)
+	\end{equation}
+	cuya solución cumple: 
+	\[
+	{(A^TA + \lambda \mathrm{L^TL})x = A^Tb}
+	\]
+	 Nuevamente, la elección del regularizador $\lambda$ es extremadamente importante, lo que nos lleva a pensar... ¿Existe algún método optimización de elección de este parámetro?
+	
+	\subsection{Descomposición SVD}
+	La Descomposición en Valores Singulares (SVD, por sus siglas en inglés) es una técnica de factorización de matrices muy popular y ampliamente utilizada. Dada una matriz $A \in \mathbb{R}^{m \times n}$, ésta puede ser descompuesta en tres matrices:
+	
+	\[
+	A = U \Sigma V^T = \sum_{i=1}^{n} \sigma_i u_i v_i^T
+	\]
+	
+	donde:
+	
+	\begin{itemize}
+		\item \( U \) es una matriz cuyas columnas son los vectores propios ortonormales de \( A A^T \).
+		\item \( \Sigma \) es una matriz diagonal con los valores singulares de \( A \) en la diagonal.
+		\item \( V^T \) es la transpuesta de una matriz cuyas filas son los vectores propios ortonormales de \( A^T A \).
+	\end{itemize}
+	
+	\section*{Propiedades de \( U \), \( \Sigma \) y \( V \)}
+	
+	\begin{enumerate}
+		\item \textbf{Matriz \( U \)}: Es una matriz cuadrada cuyas columnas son vectores ortonormales. Esto significa que \( U^T U = I_n \).
+		
+		\item \textbf{Matriz \( V \)}: Al igual que \( U \), \( V \) es una matriz cuadrada cuyas filas son vectores ortonormales. Esto implica que \( V^T V = I_n \).
+		
+		\item \textbf{Matriz \( \Sigma \)}: Es una matriz diagonal, $ \Sigma  = \text{diag}(\sigma_1, \sigma_2, \dots, \sigma_n)$, con los valores singulares de $A$ ordenados de manera descendiente,
+		\[
+		\sigma_1 \geq \sigma_2 \geq \dots \geq \sigma_n \geq 0
+		\]
+		
+	\end{enumerate}
+	
+	\subsection{Curva L}
+	 
+	 
+\end{document}
