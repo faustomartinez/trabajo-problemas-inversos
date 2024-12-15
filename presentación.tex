@@ -11,6 +11,11 @@
 \usepackage{float}
 \newcommand{\norm}[1]{\left\lVert#1\right\rVert}
 \newtheorem{proposition}{Proposición}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{positioning,fit}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \title{Métodos iterativos para la solución de problemas inversos discretos}
 
@@ -234,7 +239,178 @@
 	\section{Implementación}
 	% Acá va a ir todo lo de Faus, código, implementaciones, ejemplos, bla bla
 	
+	\begin{frame}{Ejemplo}
+		
+		\ Con todo esto en mente, ahora implementemoslo a un ejemplo práctico. Consideremos la siguiente imágen generada de un mate:
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=3.5cm]{Imagenes/Imagenes/x_true.png}
+		\end{figure}
+		
+		\ A lo largo del ejemplo veremos cómo reconstruir esto si agregamos ruido con las herramientas que aprendimos.
+		
+	\end{frame}
 	
+	\begin{frame}{Operador de Desenfoque}
+		
+		Primero veamos cómo la operador de desenfoque $\mathbf A$ afecta a un punto:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=3cm]{Imagenes/Imagenes/y_pixel.png}
+			\qquad\tikz[baseline=-\baselineskip]\draw[ultra thick,->] (0,0) -- ++ (1,0);\qquad % NO PUDE ENCONTRAR COMO CENTRARLA
+			\includegraphics[width=3cm]{Imagenes/Imagenes/Ay_pixel.png}
+			\label{fig:mate}
+		\end{figure}
+		
+		
+	\end{frame}
 	
+	\begin{frame}{Construcción del problema}
+		
+		\ Nosotros vamos a tener un $\mathbf b$ que representaría nuestra imágen ya desenfocada. A partir de él, vamos a reconstruir a $\mathbf x_{true}$ nuestra imágen original. Nuestro punto de partida sería $\mathbf b_{true}=\mathbf A \mathbf x_{true}$.
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=3.5cm]{Imagenes/Imagenes/b_true.png}
+			\label{fig:mate}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{Tipos de ruido}
+		
+		\ Estos son los tipos más normales de ruido que podríamos encontrarnos, aunque nosotros trabajaremos con un ruido Gaussiano.
+		
+		\begin{figure}
+			\centering
+			\begin{minipage}{.5\textwidth}
+				\centering
+				\includegraphics[width=.4\linewidth]{Imagenes/Imagenes/mate_Gauss.png}
+				\captionof{figure}{Ruido Gaussiano}
+			\end{minipage}%
+			\begin{minipage}{.5\textwidth}
+				\centering
+				\includegraphics[width=.4\linewidth]{Imagenes/Imagenes/mate_Poisson.png}
+				\captionof{figure}{Ruido Poisson}
+			\end{minipage}
+			\begin{minipage}{.5\textwidth}
+				\centering
+				\includegraphics[width=.4\linewidth]{Imagenes/Imagenes/mate_saltpepper.png}
+				\captionof{figure}{Ruido Salt \& Pepper}
+			\end{minipage}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{Regularización}
+		
+		\ La solución directa del sistema $\mathbf Ax=b$ no es una buena idea, ya que nos devuelve esto:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=9cm]{Imagenes/Imagenes/mate_metodoDirecto.png}
+		\end{figure}
+		
+		\ Por eso recurrimos a métodos de regularización que salven este problema.
+		
+	\end{frame}
+	
+	\begin{frame}{GMRES}
+		
+		\ Si utilizamos GMRES para poder conseguir soluciones iterativamente y conseguimos pararlo antes que la solución se contamine demasiado de ruido conseguimos esto:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=9cm]{Imagenes/Imagenes/mate_GMRES.png}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{Tikhonov}
+		
+		\ Otra idea que puede surgir es usar Tikhonov, que después de trabajar la solución podemos obtener esto:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=4cm]{Imagenes/Imagenes/mate_tikh_lambda_arbitrario.png}
+		\end{figure}
+		
+		\ Pero esto se puede mejorar.
+		
+	\end{frame}
+	
+	\begin{frame}{Elección de $\lambda$}
+		
+		\ Como ya vimos, la Curva L puede ser un buen método para encontrar un $\lambda$ apropiado, comparando $\|\mathbf{Ax}^{\rm reg} - \mathbf{b}\|$ vs $\|\mathbf{x}^{\rm reg}\|$. Esto nos lleva al siguiente resultado:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=8.5cm]{Imagenes/Imagenes/L_curve_tikh_codo.png}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{Tikhonov}
+		
+		\ Ahora con una elección de $\lambda$ óptima, con Tikhonov podemos lograr esto:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=9cm]{Imagenes/Imagenes/mate_tikh.png}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{Tikhonov Generalizado}
+		
+		\ Más aún, si utilizamos Tikhonov generalizado $\mathbf{\min_{x} \|Ax-b\|_2^2 + \lambda^2 \|Lx\|_2^2}\,,$ con $L$ el operador de derivada de primer orden, podemos conseguir:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=8.5cm]{Imagenes/Imagenes/L_curve_gtikh.png}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{Tikhonov Generalizado}
+		
+		\ Y con este $\lambda$ podemos encontrar una pequeña mejora:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=9cm]{Imagenes/Imagenes/mate_gtikh.png}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{LSQR}
+		
+		\ Otro enfoque que se le puede dar al problema es usar LSQR para minimizar $\|Ax-b\|_2^2$ a la vez que $\|x\|_2^2$. Aplicandolo obtenemos lo siguiente:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=9cm]{Imagenes/Imagenes/mate_lsqr.png}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{LSMR}
+		
+		\ De la misma manera, LSMR es un método que también minimiza $\|Ax-b\|_2^2$ a la vez que $\|x\|_2^2$, por lo que resulta en:
+		
+		\begin{figure}[htp]
+			\centering
+			\includegraphics[width=9cm]{Imagenes/Imagenes/mate_lsmr.png}
+		\end{figure}
+		
+	\end{frame}
+	
+	\begin{frame}{Conclusiones}
+		
+		\ Como vimos, las maneras de resolver problemas mal condicionados son muchas, todas con distintos requerimientos computacionales y matemáticos. Cada una se puede aplicar de manera satisfactoria dependiendo nuestro problema y las condiciones que tengamos, pero en general siempre hay que hacer un estudio de qué conviene en cada caso.
+		
+	\end{frame}
 	
 \end{document}
+
