@@ -5,6 +5,12 @@
 \usepackage{amssymb} 
 \usepackage{amsmath}
 \usepackage{amsthm}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage[noend]{algpseudocode}
+\usepackage{float}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newtheorem{proposition}{Proposición}
 
 \title{Métodos iterativos para la solución de problemas inversos discretos}
 
@@ -66,7 +72,7 @@
 	
 	\begin{frame}{Motivación del Método}
 		
-		\ Notemos que la idea de utilizar subespacios de Krylov para resolver problemas lineales surge naturalmente de entender el problema, pues dada la solución $x_{true}=A^{-1}b$ y $x_0$ una aproximación inicial para el método, resolver el sistema original es equivalente a resolver $Az=r_0$ si $z=x_{true}-x_0$. \\ Sea $p(x)$ el polinomio de menor grado $i$ tal que $p(A)r_0=0$. Por el teorema de Cayley-Hamilton, tenemos que $i\leq n$. Entonces tenemos que: $$p(A)=a_0+Aa_1+\dots+a_{i-1}A^{i-1}+a_iA^i=0$$ 
+		\ Sea $x_{true}=A^{-1}b$ y $x_0$ una aproximación inicial para el método, resolver el sistema original es equivalente a resolver $Az=r_0$ si $z=x_{true}-x_0$. Sea $p(x)$ el polinomio de menor grado $i$ tal que $p(A)r_0=0$. Por el teorema de Cayley-Hamilton, tenemos que $i\leq n$. Entonces tenemos que: $$p(A)=a_0+Aa_1+\dots+a_{i-1}A^{i-1}+a_iA^i=0$$ 
 		
 	\end{frame}
 	
@@ -78,8 +84,152 @@
 	
 	\begin{frame}{Métodos de Proyección}
 		
+		\ Como $x_{true} \in x_0 + \mathcal{K}_{m}(A, r_0)$, naturalmente la solución $x_n$ puede estar dada por $$x_n = x_0 + y_n, \quad  y_n \in \mathcal{K}_n(A, r_0).$$ Dado $x_0 \in \mathbb{C}^n$ una aproximación inicial a nuesta solución y $r_0 := b - Ax_0$, definimos al residuo en la iteración $n$ está dado por: $$r_n := b - Ax_n = b - A(x_0 + y_n) = r_0 - Ay_n, \quad r_n\in \ \mathcal{K}_{n+1}(A, r_0).$$ Veamos algunos enfoques para determinar $x_n$ de manera óptima.
 		
 	\end{frame}
+	
+	\begin{frame}{Enfoque de Ritz-Galerkin y Petrov-Galerkin}
+		
+		\begin{flushleft}
+			\textbf{Enfoque de Ritz-Galerkin}
+		\end{flushleft} 
+		Para este enfoque, necestimaos imponer una reestricción en cuanto a la noción de ortgonalidad de la siguiente manera para cada $n \in \mathbb{N}$: $$r_n \perp \mathcal{K}_{n}(A, r_0)$$
+		
+		\begin{flushleft}
+			\textbf{Enfoque de Petrov-Galerkin}
+		\end{flushleft}
+		\ Aquí vamos a pedir que el residuo sea ortogonal a un subespacio $\mathcal{L} \subset \mathbb{C}^{n}$ de dimensión $n$, es decir, 	$$r_n \perp \mathcal{L}_n, \quad dim(\mathcal{L}_n) = n$$
+	\end{frame}
+	
+	\begin{frame}{Método de Arnoldi}
+		
+		\ Sea $V_i$ la matriz de tamaño $n\times i$ con $v_1, ..., v_i$ como columnas, $H_i$ la matriz de Hessenberg de tamaño $(i+1)\times i$ cuyos elementos no nulos son los $h_{ij}$ descritos en el algoritmo de Arnoldi, entonces se verifica que: $$AV_j=V_{j+1}H_i$$
+		
+		
+		
+	\end{frame}
+	
+	\begin{frame}
+		
+		\begin{algorithm}[H]
+			\caption{Algoritmo de Arnoldi}\label{algorithm_1}
+			\begin{algorithmic}[1]
+				\State Comencemos con $v_1=\frac{v}{\norm{v}}$
+				\For{$j \in \{1, 2, \dots, i\}$}
+				
+				\State Computamos $h_{ij} = v_i^TAv_j$ para $i \in \{1, 2, \dots, j\}$
+				\State $w_j = Av_j - \sum_{i=1}^j h_{ij} v_i$
+				\State $h_{j+1,j} = \|w_j\|_2$
+				\If{$h_{j+1,j} = 0$}
+				
+				\State Stop
+				\EndIf
+				\EndFor
+				\State $v_{j+1} = w_j / h_{j+1,j}$
+			\end{algorithmic}
+		\end{algorithm}   
+		
+	\end{frame}
+	
+	\begin{frame}{GMRES}
+		
+		\ GMRES (Generalized Minimal Residual Method) busca minimizar $J(y)=||b-Ax||_2$ a través de sus componentes ortonormales, minimizando en cada paso los vectores residuales. \\
+		\ Sea $x_0$ una aproximación inicial, tenemos que para todo $x_i\in\mathcal{K}_m+x_0$ vale que $$x=x_0+V_my$$ donde $V_m$ es la misma matriz definida en el método de Arnoldi, e $y$ es un vector de tamaño $m$.
+		
+	\end{frame}
+	
+	\begin{frame}{GMRES}
+		
+		Sean $\beta = ||r_0||_2$ y $v_1=\frac{r_0}{||r_0||_2}$, y teniendo en cuenta la igualdad en el metodo de Arnoldi, podemos reescribir el problema a minimizar como:
+		\begin{equation*}
+			\begin{split}
+				b-Ax&=b-A(x_0+V_my)\\
+				`    &= r_0-AV_my\\
+				&= \beta v_1-V_{m+1}H_my\\
+				&= V_{m+1}(\beta e_1 - H_my)
+			\end{split}
+		\end{equation*}
+		luego, 
+		\begin{equation*}
+			\begin{split}
+				J(y)&=||b-Ax_i||_2\\
+				&=||V_{m+1}(\beta e_1 - H_my_m)||_2    
+			\end{split}
+		\end{equation*}
+		y como los vectores columna de $V_{m+1}$ son ortonormales, entonces:
+		$$J(y)=||\beta e_1 - H_my||_2$$
+		
+	\end{frame}
+	
+	\begin{frame}
+		
+		\begin{algorithm}[H]
+			\caption{Algoritmo GMRES}
+			\begin{algorithmic}[1]
+				\State \textbf{Dada} $\mathbf{A} \in \mathbb{R}^{n \times n}$, $\mathbf{b} \in \mathbb{R}^n$, $\mathbf{x}^{(0)}$, calcular $\mathbf{r}^{(0)} = \mathbf{b} - \mathbf{A} \mathbf{x}^{(0)}$
+				\State $\mathbf{v}_1 = \frac{\mathbf{r}^{(0)}}{\|\mathbf{r}^{(0)}\|}$
+				\For{$k = 1, 2, \dots, m$}
+				\State Calcular $\mathbf{w_k} = \mathbf{A} \mathbf{v}_k$
+				\For{$j = 1, \dots, k$}
+				\State $h_{jk} = \mathbf{w}^T \mathbf{v}_j$
+				\State $\mathbf{w_k} := \mathbf{w_k} - h_{jk} \mathbf{v}_j$
+				\EndFor
+				\State $h_{k+1,k} = \|\mathbf{w_k}\|$
+				\If{$h_{k+1,k} \neq 0$}
+				\State $\mathbf{v}_{k+1} = \frac{\mathbf{w_k}}{h_{k+1,k}}$
+				\EndIf
+				\EndFor
+				\State Resolver el problema de mínimos cuadrados $\min_y \|\beta \mathbf{e}_1 - \mathbf{H}_k y\|_2$
+				\State Actualizar la solución: $\mathbf{x}^{(k)} = \mathbf{x}^{(0)} + \mathbf{V}_k y$
+				\If{$\|\mathbf{r}^{(k)}\| <$ tolerancia}
+				\State Romper el ciclo
+				\EndIf
+			\end{algorithmic}
+		\end{algorithm}
+		
+	\end{frame}
+	
+	\begin{frame}{Regularización de Tikhonov}
+		
+		\ La regularización es una técnica que busca sistemas lineales mal condicionados agregando un término regularizante. Tikhonov en particular busca resolver $$\min_{x} \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda \| \mathbf{x} \|_2^2 \right)$$ con $\lambda > 0$ el parámetro regularizante. Si consideramos $\phi(x) = \|Ax - b\|^2 + \lambda \|x\|^2$, tenemos que: \[
+		\nabla \phi(x) = 2A^T(Ax - b) + 2\lambda x = 0 \iff 
+		\boxed{(A^TA + \lambda \mathrm{Id})x = A^Tb}
+		\]
+		
+	\end{frame}
+	
+	\begin{frame}{Regularización de Tikhonov generalizada}
+		\ En general, se suele pedir que la solución minimice cierta cantidad 
+		\[
+		\Omega(x) = \| L(x) \|_2
+		\] con $L$ un operador que bien puede ser la identidad o el operador de derivación. Si además conocemos un estimador inicial de la solución $x^*$, $$\Omega(x) = \| L(x - x^*) \|^2.$$ Y en definitiva queremos encontrar $$\min \left( \| \mathbf{A}x - \mathbf{b} \|_2^2 + \lambda \| \mathbf{L(x - x^*)} \|_2^2 \right)$$
+		
+		
+	\end{frame}
+	
+	\begin{frame}{Descomposición SVD}
+		
+		\ Sea $A \in \mathbb{R}^{m \times n}$, la descomposición SVD nos permite escrbrir a $A$ como: $$A = U \Sigma V^T = \sum_{i=1}^{n} \sigma_i u_i v_i^T$$
+		donde:
+		
+		\begin{itemize}
+			\item \( U \) es una matriz cuyas columnas son los vectores propios ortonormales de \( A A^T \).
+			\item \( \Sigma \) es una matriz diagonal con los valores singulares de \( A \) en la diagonal.
+			\item \( V^T \) es la transpuesta de una matriz cuyas filas son los vectores propios ortonormales de \( A^T A \).
+		\end{itemize}
+		
+	\end{frame}
+	
+	\begin{frame}{Curva L}
+		
+		\ Una forma de hallar el valor regularizador es la Curva L, que consiste en graficar la relación entre la norma del residuo y la de la solución: $$L(\lambda) := \{(\phi (\| x_\lambda  \|^2), \phi (\| \mathbf{A}x_\lambda - \mathbf{b} \|^2) ): \lambda > 0\}$$ con $\phi$ una función monótona creciente, generalmente $\phi(t) = \log(t)$ o $\phi(t) = t$.
+		
+		\begin{proposition}
+			Sean $q(\lambda) = \phi (\| x_\lambda  \|^2)$ y $s(\lambda) = \phi (\| \mathbf{A}x_\lambda - \mathbf{b} \|^2 )$, con $L = \mathrm{Id}$ y $\phi$ una función diferenciable y monótona creciente. Entonces $q(\lambda)$ es una función decreciente y $s(\lambda)$ es creciente en función de $\lambda$.
+		\end{proposition}
+		
+	\end{frame}
+	
 	
 	\section{Implementación}
 	% Acá va a ir todo lo de Faus, código, implementaciones, ejemplos, bla bla
