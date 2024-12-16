@@ -25,25 +25,25 @@
 	\tableofcontents
 	
 	
-	\chapter{Introducción}
+	\chapter{Métodos Iterativos para resolver problemas inversos}
 	\ En este texto se pretende estudiar el problema de enfoque de imágenes. A partir de una imagen borrosa con ruido y una matriz de desenfoque, nuestro objetivo es encontrar nuestra imagen original utilizando su versión borrosa. Este problema se puede formular a través de un sistema lineal $Ax = b$, donde $A$ es la matriz de desenfoque, $b$ es el ruido y $x$ es la imagen a restaurar. Debido a su mal condicionamiento, nos interesan los métodos de regularización para la reconstrucción de las mismas. En particular, nos interesaremos por los métodos iterativos de Krylov. Estos métodos están basados en procesos de proyección sobre un tipo de subespacios muy particulares, de los cuales el método toma el nombre. Este capítulo servirá de introducción a la estructura general de esta clase de métodos.
 	
 	Con el fin de ejemplificar los métodos mostrados y ver sus respectivas implementaciones, trabajaremos como ejemplo con la siguiente imagen de $64\times 64$ pixeles.
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.5]{Imagenes/H.png}
-		\caption{Imagen de una 'H', la cual usaremos para ejemplificar.\\}
+		\includegraphics[scale=0.5]{Imagenes/x_true.png}
+		\caption{Imagen de un mate, la cual usaremos para ejemplificar.\\}
 	\end{figure}
 	
 	El ruido por lo general no tiene una forma especifica, y con fines de replicar un problema lo mas fidedigno a la realidad, se debe aplicar un tipo de ruido de acuerdo al problema que se quiere estudiar. Entre los tipo de ruidos mas comunes encontramos el Gaussiano, el de Poisson, el de Laplace, y el de Salt\&Pepper. A lo largo de este trabajo asumimos el ruido del primer tipo. 
 	
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.3]{Imagenes/H_Gauss.png}
-		\includegraphics[scale=0.3]{Imagenes/H_Poisson.png}
-		\includegraphics[scale=0.3]{Imagenes/H_Laplace.png}
-		\includegraphics[scale=0.3]{Imagenes/H_SyP.png}
+		\includegraphics[scale=0.3]{Imagenes/mate_Gauss.png}
+		\includegraphics[scale=0.3]{Imagenes/mate_Poisson.png}
+		\includegraphics[scale=0.3]{Imagenes/mate_Laplace.png}
+		\includegraphics[scale=0.3]{Imagenes/mate_saltpepper.png}
 		\caption{De izquierda a derecha: Ruido Gaussiano, ruido de Poisson, ruido de Laplace, ruido Salt\&Pepper\\}
 	\end{figure}
 	
@@ -177,7 +177,7 @@ A veces es útil hallar una base orto-normal para un método iterativo, pues uno
 	
 	Para deducir el método, hagamos un par de observaciones.
 	
-	Consideremos $\mathcal{K}_m$ y un vector inicial $x_0$. luego cualquier vector en $x_i\in\mathcal{K}_m+x_0$ se escribe como $$x=x_0+V_my.$$
+	Consideremos $\mathcal{K}_m=\mathcal{K}_{m}(A, r_0)$ y un vector inicial $x_0$. luego cualquier vector en $x_i\in\mathcal{K}_m+x_0$ se escribe como $$x=x_0+V_my.$$
 	Donde $V_m$ es la misma matriz definida en el método de Arnoldi, e $y$ es un vector de tamaño $m$. Sean $\beta = ||r_0||_2$ y $v_1=\frac{r_0}{||r_0||_2}$, y teniendo en cuenta la igualdad en el método de Arnoldi, podemos reescribir el problema a minimizar como:
 	\begin{equation*}
 		\begin{split}
@@ -226,9 +226,28 @@ A veces es útil hallar una base orto-normal para un método iterativo, pues uno
 	Aplicando este método a nuestro ejemplo inicial, y aplicando un criterio de tolerancia en el residuo, obtenemos una reconstrucción bastante decente. La figura es distinguible, a pesar de que aun la reconstrucción es bastante insatisfactoria.
 	\begin{figure}[H]
 		\centering
-		\includegraphics[scale=0.5]{Imagenes/H_GMRES.png}
+		\includegraphics[scale=0.5]{Imagenes/mate_GMRES.png}
 		\caption{Reconstrucción de la imagen con ruido usando GMRES.\\}
 	\end{figure}
-	
+
+\subsection{Otros métodos.}
+
+Si bien hemos desarrollado la teoría para llegar a GMRES, los espacios de Krylov dan lugar a otros métodos que se basan en las mismas ideas. 
+ A breves rasgos, la iteracion de un metodo de Krylov debe cumplir lo siguiente
+ $$x^{(k)} \in \underset{x \in \mathcal{K}_m(A, v)}{\mathrm{arg\,min}} \, \|\mathcal{F}(x)\|
+ $$ 
+ donde $\mathcal{F}$ es la funcion con argumento $x$ que nos interesa minimizar iterativamente, proyectando en el subespacio $\mathcal{K}_m(A,v)$.
+ 
+ En estas ideas se basan LSQR y LSMR, donde ambos se sobre el subespacio de Krylov $\mathcal{K}_m (AA^t, r_0)$, aunque minimizan una $F(x)$ distinta. A saber: LSQR minimiza el problema de minimos cuadrados $||Ax-b||$, mientras que LSMR resuelve el problema regularizado $||(A^tA+\lambda ^2 I)x-A^tb||$.
+
+Las ventajas de estos enfoques son que son mas estables computacionalmente para problemas contaminados con ruido. En nuestro caso, la mejora es significativa con respecto al método anterior. 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{Imagenes/mate_lsqr.png}
+	\includegraphics[scale=0.5]{Imagenes/mate_lsmr.png}
+	\caption{Reconstrucción de la imagen con ruido usando LSQR y LMSR.\\}
+\end{figure}
+ 
 \end{document}
 	
