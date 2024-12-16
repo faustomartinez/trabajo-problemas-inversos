@@ -10,6 +10,7 @@
 Este proyecto es un trabajo final para una materia optativa de la Universidad de Buenos Aires, dictada por la doctora Malena Español. 
 
 Ahondamos en la implementación de determinados métodos iterativos para la solución de un ejemplo de un problema inverso discreto, el problema del desenfoque de imágenes.
+Esto lo aplicamos al ejemplo concreto de una imagen en blanco y negro de la silueta de un mate.
 
 Comenzaamos con una solución naive, que nos proporciona una solución así:
 
