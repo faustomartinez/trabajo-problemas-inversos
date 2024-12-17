@@ -14,7 +14,7 @@ Esto lo aplicamos al ejemplo concreto de una imagen en blanco y negro de la silu
 
 Comenzaamos con una solución naive, que nos proporciona una solución así:
 
-![Solución 1](https://github.com/faustomartinez/trabajo-problemas-inversos/blob/main/Imagenes/mate_metodoDirecto.png)
+![Solución 1](https://github.com/faustomartinez/trabajo-problemas-inversos/blob/main/Imagenes/mate_directo.png)
 
 A aplicar métodos avanzados del Álgebra Lineal Numérica, que nos llevan a una mucho mejor aproximación:
 
